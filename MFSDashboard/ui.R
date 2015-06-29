@@ -4,6 +4,7 @@ library(ggplot2)
 library(leaflet)
 library(htmltools)
 library(shinydashboard)
+library(shinyBS)
 tagCPUE<-read.csv("Tag_vCPUE.csv")
 dashboardPage(
   dashboardHeader(title = "WDFW Marine Fish Science"),
@@ -47,6 +48,8 @@ dashboardPage(
                 )
       ),
       tabItem(tabName= "tagdata",
+              bsModal("modalExample", "CPUE Data Table", "tabButTagCPUE", size = "large",
+                      "Each record represents a fishing set. Column FishCount represent the total number of fish caught during that set. FishCount and other totals will reflect update automatically to reflect filters."),
               fluidRow(
                 box(title = "Filters", width = 12, collapsible = TRUE, solidHeader = TRUE,
                     column(6,
@@ -58,6 +61,7 @@ dashboardPage(
               fluidRow(
                 tabBox(title = "Tag Data",  width = 12,
                        tabPanel("CPUE by Species",
+                                actionLink("tabButTagCPUE", "Table Desription"),
                                 dataTableOutput('tagCPUEBySpeciesData', width = "100%")
                        )
                 )   
@@ -65,7 +69,6 @@ dashboardPage(
                 
               )
       )
-    
     
   )
 )

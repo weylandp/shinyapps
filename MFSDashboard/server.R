@@ -7,7 +7,12 @@ function(input, output) {
     tagCPUE<-read.csv("Tag_vCPUE.csv")
     tagCPUE <- tagCPUE[tagCPUE$SetYear<=max(input$tagCPUEyear) & tagCPUE$SetYear>=min(input$tagCPUEyear),]
     if(!is.null(input$tagCPUEspecies)){
-      tagCPUE <- tagCPUE[tagCPUE$CommonName %in% input$tagCPUEspecies | tagCPUE$CommonName == "", ,]
+      tagCPUE$FishCount[!(tagCPUE$CommonName %in% input$tagCPUEspecies)]<-0 
+      tagCPUE$MaleCount[!(tagCPUE$CommonName %in% input$tagCPUEspecies)]<-0
+      tagCPUE$FemaleCount[!(tagCPUE$CommonName %in% input$tagCPUEspecies)]<-0
+      tagCPUE$MortalityCount[!(tagCPUE$CommonName %in% input$tagCPUEspecies)]<-0
+      tagCPUE$RecoveryCount[!(tagCPUE$CommonName %in% input$tagCPUEspecies)]<-0
+      
     }
     tagCPUE <- tagCPUE %>%
                         group_by(SetID, SetDate, Latitude, Longitude) %>%
@@ -26,8 +31,31 @@ function(input, output) {
     tagCPUE<-read.csv("Tag_vCPUE.csv")
     tagCPUE <- tagCPUE[tagCPUE$SetYear<=max(input$tagCPUEDatayear) & tagCPUE$SetYear>=min(input$tagCPUEDatayear),]
     if(!is.null(input$tagCPUEDataspecies)){
-      tagCPUE <- tagCPUE[tagCPUE$CommonName %in% input$tagCPUEDataspecies | tagCPUE$CommonName == "", ,]
+      tagCPUE$FishCount[!(tagCPUE$CommonName %in% input$tagCPUEDataspecies)]<-0 
+      tagCPUE$MaleCount[!(tagCPUE$CommonName %in% input$tagCPUEDataspecies)]<-0
+      tagCPUE$FemaleCount[!(tagCPUE$CommonName %in% input$tagCPUEDataspecies)]<-0
+      tagCPUE$MortalityCount[!(tagCPUE$CommonName %in% input$tagCPUEDataspecies)]<-0
+      tagCPUE$RecoveryCount[!(tagCPUE$CommonName %in% input$tagCPUEDataspecies)]<-0
     }
+    tagCPUE <- tagCPUE %>%
+      group_by(SetID,
+               SetDate,
+               SetYear,
+               SetMonth,
+               SetSeason,
+               VesselName,
+               ProjectName,
+               Latitude,
+               Longitude,
+               PunchCardArea
+) %>%
+      summarise(RodHours = mean(RodHours),
+                FishCount = sum(FishCount),
+                MaleCount = sum(MaleCount),
+                FemaleCount = sum(FemaleCount),
+                MortalityCount = sum(MortalityCount),
+                RecoveryCount = sum(RecoveryCount)
+      )
     datatable(tagCPUE,  options = list (scrollX = '100%'))
   })
   
