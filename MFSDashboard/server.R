@@ -13,12 +13,13 @@ function(input, output) {
                         group_by(SetID, SetDate, Latitude, Longitude) %>%
                         summarise(RodHours = mean(RodHours),
                                   FishCount = sum(FishCount))
-    cpuePal <- colorBin("RdYlGn", sqrt(tagCPUE$FishCount/tagCPUE$RodHours), n=9)
     
+    colfunc <- colorRampPalette(c("red","yellow","green"))
+    cpuePal <- colorNumeric(palette = colfunc(20), domain = tagCPUE$FishCount/tagCPUE$RodHours)
     leaflet(tagCPUE) %>%
       addProviderTiles("Acetate.terrain") %>%
-      addCircleMarkers( lng= tagCPUE$Longitude, lat= tagCPUE$Latitude, fillOpacity = .5 , color = ~cpuePal(sqrt(FishCount/RodHours)), radius = 1, popup = paste0("<strong>Date: </strong>",tagCPUE$SetDate, "<br><strong>Fish Count: </strong>", tagCPUE$FishCount, "<br><strong>CPUE: </strong>", tagCPUE$FishCount/tagCPUE$RodHours)) %>%
-      addLegend(pal = cpuePal, values = (tagCPUE$FishCount/tagCPUE$RodHours))
+      addCircleMarkers( lng= tagCPUE$Longitude, lat= tagCPUE$Latitude, fillOpacity = .5 , color = ~cpuePal(FishCount/RodHours), radius = 1, popup = paste0("<strong>Date: </strong>",tagCPUE$SetDate, "<br><strong>Fish Count: </strong>", tagCPUE$FishCount, "<br><strong>CPUE: </strong>", tagCPUE$FishCount/tagCPUE$RodHours)) %>%
+      addLegend(pal = cpuePal, title="CPUE Fish/Hour",values = (tagCPUE$FishCount/tagCPUE$RodHours))
     
   })
   output$tagCPUEBySpeciesData <- renderDataTable({
