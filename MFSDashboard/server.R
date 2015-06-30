@@ -1,4 +1,5 @@
 library(dplyr)
+library(ggplot2)
 function(input, output) {
   
   
@@ -58,5 +59,51 @@ function(input, output) {
       )
     datatable(tagCPUE,  options = list (scrollX = '100%'))
   })
+output$tagccpuePlot <- renderPlot({
+  tagCPUE<-read.csv("Tag_vCPUE.csv")
+  tagCPUE <- tagCPUE[tagCPUE$SetYear<=max(input$tagCPUEPlotyear) & tagCPUE$SetYear>=min(input$tagCPUEPlotyear),]
+  if(!is.null(input$tagCPUEPlotspecies)){
+    tagCPUE$FishCount[!(tagCPUE$CommonName %in% input$tagCPUEPlotspecies)]<-0 
+    tagCPUE$MaleCount[!(tagCPUE$CommonName %in% input$tagCPUEPlotspecies)]<-0
+    tagCPUE$FemaleCount[!(tagCPUE$CommonName %in% input$tagCPUEPlotspecies)]<-0
+    tagCPUE$MortalityCount[!(tagCPUE$CommonName %in% input$tagCPUEPlotspecies)]<-0
+    tagCPUE$RecoveryCount[!(tagCPUE$CommonName %in% input$tagCPUEPlotspecies)]<-0
+  }
+  tagCPUE <- tagCPUE %>%
+    group_by(SetID,
+             SetDate,
+             SetYear,
+             SetMonth,
+             SetSeason,
+             VesselName,
+             ProjectName,
+             Latitude,
+             Longitude,
+             PunchCardArea
+    ) %>%
+    summarise(RodHours = mean(RodHours),
+              FishCount = sum(FishCount),
+              MaleCount = sum(MaleCount),
+              FemaleCount = sum(FemaleCount),
+              MortalityCount = sum(MortalityCount),
+              RecoveryCount = sum(RecoveryCount)
+    )
+  if(input$cpuePlotFacetType=="PCA"){
+    tagCPUE <- tagCPUE %>%
+      group_by(SetYear,
+               PunchCardArea
+      ) %>%
+      summarise(RodHours = sum(RodHours),
+                FishCount = sum(FishCount),
+                MaleCount = sum(MaleCount),
+                FemaleCount = sum(FemaleCount),
+                MortalityCount = sum(MortalityCount),
+                RecoveryCount = sum(RecoveryCount)
+      )
+  }
+  ggplot(data = tagCPUE, aes(x = SetYear, y = FishCount/RodHours)) + geom_bar(stat="identity") + facet_grid(PunchCardArea ~ .) + scale_x_continuous(breaks=tagCPUE$SetYear) + theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = .5))
+  
+ 
+})
   
 }

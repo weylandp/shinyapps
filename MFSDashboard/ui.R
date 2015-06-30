@@ -47,6 +47,26 @@ dashboardPage(
                 
                 )
       ),
+      tabItem(tabName= "tagTrends",
+              fluidRow(
+                box(title = "Filters", width = 12, collapsible = TRUE, solidHeader = TRUE,
+                    column(6,
+                           sliderInput('tagCPUEPlotyear', 'Year', width='100%', min = min(tagCPUE$SetYear), max = max(tagCPUE$SetYear), value= c(max(tagCPUE$SetYear)-5,max(tagCPUE$SetYear) ), sep="", step = 1)),
+                    column(6,   
+                           selectInput('tagCPUEPlotspecies', 'Species', width='100%',levels(factor(tagCPUE$CommonName)), multiple = TRUE))
+                )),
+              
+              fluidRow(
+                
+                tabBox(title = "Nearshore Tag Trends",  width = 12,
+                       tabPanel("CPUE",
+                                selectInput('cpuePlotFacetType', "Facet by", c("PCA","Season","PCA and Season")),
+                                plotOutput('tagccpuePlot', width='100%', height =550)
+                       )   
+                )
+                
+              )
+      ),
       tabItem(tabName= "tagdata",
               bsModal("modalExample", "CPUE Data Table", "tabButTagCPUE", size = "large",
                       "Each record represents a fishing set. Column FishCount represent the total number of fish caught during that set. FishCount and other totals will reflect update automatically to reflect filters."),
