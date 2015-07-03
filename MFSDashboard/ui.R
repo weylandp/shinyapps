@@ -5,7 +5,9 @@ library(leaflet)
 library(htmltools)
 library(shinydashboard)
 library(shinyBS)
-tagCPUE<-read.csv("Tag_vCPUE.csv")
+library(googleVis)
+library(data.table)
+tagCPUE<-fread("Tag_vCPUE.csv")
 dashboardPage(
   dashboardHeader(title = "WDFW Marine Fish Science"),
   dashboardSidebar(
@@ -22,7 +24,9 @@ dashboardPage(
       menuItem("Puget Sound Unit", icon = icon("th") ,
         menuSubItem("ROV Survey",tabName = "rovsurvey"),
         menuSubItem("PS Trawl",tabName = "pstrawl")),
-      menuItem("Fish Ticket", tabName = "ft"),
+      menuItem("Fish Ticket", icon = icon("th"),
+        menuSubItem("Trends", icon = icon("line-chart"), tabName = "ftTrends")) ,
+                 
       menuItem("MFS Documents", tabName = "mfsdocs")
     )
   ),
@@ -81,13 +85,32 @@ dashboardPage(
               fluidRow(
                 tabBox(title = "Tag Data",  width = 12,
                        tabPanel("CPUE by Species",
-                                actionLink("tabButTagCPUE", "Table Desription"),
+                                actionLink("tabButTagCPUE", "Table Description"),
                                 dataTableOutput('tagCPUEBySpeciesData', width = "100%")
                        )
                 )   
                 )
                 
+              ),
+      tabItem(tabName= "ftTrends",
+             
+              fluidRow(
+                box(title = "Filters", width = 12, collapsible = TRUE, solidHeader = TRUE,
+                    column(6,
+                      uiOutput("FTTrendsYearSlider")
+                    )
+                    )),
+              
+              fluidRow(
+                tabBox(title = "Fish Ticket Trends",  width = 12,
+                       tabPanel("Calendar",
+                                actionLink("tabButFTHeatMap", "Calendar Map Description"),
+                                htmlOutput('ftHeatMap', width = "100%", height = "100%")
+                       )
+                )   
               )
+              
+      )
       )
     
   )

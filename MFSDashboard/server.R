@@ -1,5 +1,9 @@
 library(dplyr)
 library(ggplot2)
+library(googleVis)
+library(data.table)
+library(lubridate)
+#ftData<-fread("C:/data/R Projects/ShinyApps/MFSDashboard/MFSDashboard/FTGrouped.csv")
 function(input, output) {
   
   
@@ -105,5 +109,11 @@ output$tagccpuePlot <- renderPlot({
   
  
 })
-  
+output$FTTrendsYearSlider <- renderUI({
+  sliderInput("FTTrendsyear", 'Year', width='100%', min = 1970, max = 2015, value= c(2005,2015), sep="", step = 1)
+})
+
+
+
+
 }
